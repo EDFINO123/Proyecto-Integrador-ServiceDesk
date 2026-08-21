@@ -23,10 +23,10 @@ Accede a la carpeta principal estructurada con toda la documentación, presentac
 📁 **[Enlace a la Carpeta Principal del Proyecto en Google Drive](https://drive.google.com/drive/folders/1XtGc5ZzSqpIKNCsG2RKjPMNUbtiqnKJg?usp=sharing)**
 
 ### Estructura de la Entrega:
-* 📄 `📁 Documentacion/`: Informe Final del Proyecto Integrador (.docx / .pdf).
-* 📊 `📁 Presentacion/`: Diapositivas de la exposición (.pptx).
-* 🎥 `📁 Video_Exposicion/`: Grabación explicativa del sistema y la arquitectura.
-* 🛠️ `📁 Recursos_Adicionales/`: Manual de usuario, guía de instalación y scripts.
+* 📄 `📁 documentacion/`: Informe Final del Proyecto Integrador (.docx / .pdf).
+* 📊 `📁 presentacion/`: Diapositivas para la exposición (.pptx).
+* 🎥 `📁 grabacion/`: Video explicativo de la exposición y arquitectura.
+* 💻 `📁 codigo_fuente/`: Código del Backend (Spring Boot) y Frontend (Angular).
 
 ---
 
