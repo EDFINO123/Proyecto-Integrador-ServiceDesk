@@ -1,0 +1,9 @@
+@if (src(); as srcVal) {
+  <img
+    [src]="srcVal"
+    [alt]="usuario()?.nombre ?? 'Avatar'"
+    [class]="imagenClases() + ' rounded-full object-cover shadow-lg shadow-purple-600/20'"
+  />
+} @else {
+  <span [class]="clases() + ' rounded-full'">{{ inicial() }}</span>
+}

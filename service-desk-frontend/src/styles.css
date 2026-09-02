@@ -1,0 +1,151 @@
+@import 'tailwindcss';
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.25s ease-out;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  animation: disco-lights 12s infinite alternate ease-in-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.blob1 {
+  width: 500px;
+  height: 500px;
+  background: #7c3aed;
+  top: -10%;
+  left: -5%;
+  animation-duration: 10s;
+}
+
+.blob2 {
+  width: 500px;
+  height: 500px;
+  background: #db2777;
+  bottom: -10%;
+  right: -5%;
+  animation-duration: 10s;
+  animation-delay: -1s;
+}
+
+.blob3 {
+  width: 400px;
+  height: 400px;
+  background: #4f46e5;
+  top: 20%;
+  right: 65%;
+  opacity: 0.25;
+  animation-duration: 6s;
+}
+
+@keyframes disco-lights {
+  0% {
+    transform: translate(0, 0) scale(1);
+    filter: blur(80px) hue-rotate(0deg);
+  }
+  50% {
+    transform: translate(40px, -30px) scale(1.1);
+    filter: blur(100px) hue-rotate(60deg);
+  }
+  100% {
+    transform: translate(-30px, 40px) scale(0.9);
+    filter: blur(80px) hue-rotate(-60deg);
+  }
+}
+
+.card-glow {
+  animation: card-glow 6s infinite alternate ease-in-out;
+}
+
+@keyframes card-glow {
+  from {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.15);
+  }
+  to {
+    box-shadow: 0 0 50px rgba(219, 39, 119, 0.25);
+  }
+}
+
+.audio-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 32px;
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
+}
+
+.audio-bar {
+  width: 4px;
+  background: linear-gradient(to top, #7c3aed, #db2777);
+  border-radius: 10px;
+  transform-origin: center;
+  animation: music-flow 1.5s ease-in-out infinite;
+}
+
+.audio-bar.b1,
+.audio-bar.b5 {
+  height: 10px;
+  animation-delay: 0.4s;
+  opacity: 0.6;
+}
+
+.audio-bar.b2,
+.audio-bar.b4 {
+  height: 18px;
+  animation-delay: 0.2s;
+  opacity: 0.8;
+}
+
+.audio-bar.b3 {
+  height: 28px;
+  animation-delay: 0s;
+  opacity: 1;
+}
+
+@keyframes music-flow {
+  0%,
+  100% {
+    transform: scaleY(0.6);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1.4);
+    opacity: 1;
+    filter: brightness(1.3);
+  }
+}
+
+

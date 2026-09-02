@@ -1,0 +1,133 @@
+<div
+  class="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/30 via-slate-950 to-slate-950 p-4 text-white"
+>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+
+  <div class="animate-fade-up relative z-10 w-full max-w-md">
+    <div class="mb-8 flex flex-col items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="audio-bars">
+          <span class="audio-bar b1"></span>
+          <span class="audio-bar b2"></span>
+          <span class="audio-bar b3"></span>
+          <span class="audio-bar b4"></span>
+          <span class="audio-bar b5"></span>
+        </div>
+        <div
+          class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 text-lg font-black shadow-lg shadow-purple-600/30"
+        >
+          SD
+        </div>
+        <div class="audio-bars">
+          <span class="audio-bar b1"></span>
+          <span class="audio-bar b2"></span>
+          <span class="audio-bar b3"></span>
+          <span class="audio-bar b4"></span>
+          <span class="audio-bar b5"></span>
+        </div>
+      </div>
+      <h1
+        class="bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-2xl font-extrabold tracking-tight text-transparent"
+      >
+        Service Desk
+      </h1>
+      <p class="-mt-1 text-[10px] uppercase tracking-[0.35em] text-slate-500">
+        Portal de incidencias
+      </p>
+    </div>
+
+    <div
+      class="card-glow rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 shadow-2xl backdrop-blur-md"
+    >
+      <div
+        class="mb-6 grid grid-cols-2 gap-1 rounded-xl border border-slate-800/80 bg-slate-950/60 p-1"
+      >
+        <button type="button" (click)="alternarModo()" [class]="claseTab('login')">
+          Iniciar Sesión
+        </button>
+        <button type="button" (click)="alternarModo()" [class]="claseTab('register')">
+          Registrarse
+        </button>
+      </div>
+
+      <form class="space-y-4" (ngSubmit)="enviar()" #form="ngForm">
+        @if (modo() === 'register') {
+          <div>
+            <label for="nombre" class="mb-1.5 block text-sm text-slate-400"
+              >Nombre completo</label
+            >
+            <input
+              id="nombre"
+              type="text"
+              [(ngModel)]="nombre"
+              name="nombre"
+              placeholder="Ej. Juan Pérez"
+              class="w-full rounded-xl border border-slate-800/80 bg-slate-950/60 px-3.5 py-2.5 text-sm placeholder:text-slate-600 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+            />
+          </div>
+        }
+
+        <div>
+          <label for="email" class="mb-1.5 block text-sm text-slate-400">Email</label>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="tucorreo@empresa.com"
+            class="w-full rounded-xl border border-slate-800/80 bg-slate-950/60 px-3.5 py-2.5 text-sm placeholder:text-slate-600 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="mb-1.5 block text-sm text-slate-400"
+            >Contraseña</label
+          >
+          <input
+            id="password"
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••"
+            class="w-full rounded-xl border border-slate-800/80 bg-slate-950/60 px-3.5 py-2.5 text-sm placeholder:text-slate-600 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+          />
+        </div>
+
+        @if (modo() === 'register') {
+          <div class="rounded-xl border border-slate-800/60 bg-slate-950/40 px-3.5 py-2.5 text-xs text-slate-400">
+            Tu cuenta se creará como <span class="font-semibold text-slate-300">Usuario</span>.
+            Los roles de Técnico y Administrador los asigna el equipo de soporte.
+          </div>
+        }
+
+        @if (error()) {
+          <div
+            class="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2.5 text-sm text-rose-400"
+          >
+            {{ error() }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="cargando()"
+          class="w-full rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 py-2.5 text-sm font-semibold shadow-lg shadow-purple-600/30 transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          @if (cargando()) {
+            <span
+              class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></span>
+          } @else {
+            {{ modo() === 'login' ? 'Ingresar' : 'Crear cuenta' }}
+          }
+        </button>
+      </form>
+
+      <p class="mt-5 text-center text-xs text-slate-500">
+        Demo: admin@servicedesk.com / admin123
+      </p>
+    </div>
+  </div>
+</div>

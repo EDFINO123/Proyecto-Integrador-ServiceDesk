@@ -1,0 +1,373 @@
+<main class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+  @if (cargando()) {
+    <div class="flex justify-center py-24">
+      <span
+        class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-purple-400 border-t-transparent"
+      ></span>
+    </div>
+  } @else if (error() && !ticket()) {
+    <div
+      class="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-12 text-center"
+    >
+      <p class="text-slate-300">{{ error() }}</p>
+      <button
+        (click)="cargar()"
+        class="mt-4 rounded-xl border border-slate-700/80 px-4 py-2 text-sm text-slate-300 transition hover:bg-slate-800/60"
+      >
+        Reintentar
+      </button>
+    </div>
+  } @else if (ticket(); as t) {
+    <button
+      (click)="routerBack()"
+      class="mb-4 inline-flex items-center gap-1.5 rounded-xl border border-slate-800/80 bg-slate-900/40 px-3 py-1.5 text-xs font-medium text-slate-300 backdrop-blur-md transition hover:border-purple-600/50 hover:text-white"
+    >
+      ← Volver
+    </button>
+
+    <header class="card-glow rounded-3xl border border-slate-800/80 bg-slate-900/50 p-6 backdrop-blur-md">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-2xl font-bold">{{ t.titulo }}</h1>
+            <span class="text-slate-500">#{{ t.id }}</span>
+          </div>
+          <div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
+            <span
+              class="rounded-full border px-3 py-1 font-semibold"
+              [class]="claseEstado(t.estado)"
+            >
+              {{ labelEstado(t.estado) }}
+            </span>
+            <span
+              class="rounded-full border px-3 py-1 font-semibold"
+              [class]="clasePrioridad(t.prioridad)"
+            >
+              {{ t.prioridad }}
+            </span>
+            @if (t.calificacion; as nota) {
+              <span
+                class="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 font-semibold text-amber-300"
+              >
+                @for (n of [1, 2, 3, 4, 5]; track n) {
+                  <span [class.opacity-20]="n > nota">⭐</span>
+                }
+                ({{ nota }}/5)
+              </span>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col items-end gap-2 text-sm">
+          <div class="flex items-center gap-2 text-slate-400">
+            <app-avatar
+              [usuario]="{ nombre: t.usuarioNombre, avatarUrl: t.usuarioAvatar }"
+              [tamano]="'sm'"
+            />
+            Solicitante:
+            <span class="text-slate-200">{{ t.usuarioNombre ?? t.usuarioEmail }}</span>
+          </div>
+          @if (t.tecnicoEmail) {
+            <div class="flex items-center gap-2 text-slate-400">
+              <app-avatar
+                [usuario]="{ nombre: t.tecnicoNombre, avatarUrl: t.tecnicoAvatar }"
+                [tamano]="'sm'"
+              />
+              Técnico:
+              <span class="text-slate-200">{{ t.tecnicoNombre ?? t.tecnicoEmail }}</span>
+            </div>
+          }
+          <p class="text-xs text-slate-500">
+            Creado {{ formatoFecha(t.fechaCreacion) }}
+          </p>
+        </div>
+      </div>
+
+      @if (t.adjuntoUrl; as url) {
+        <div class="mt-5 rounded-2xl border border-slate-800/80 bg-slate-950/40 p-4">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            📎 Evidencia adjunta
+          </p>
+          @if (esImagen(url) && !adjuntoRoto()) {
+            <img
+              [src]="url"
+              alt="Evidencia de la incidencia"
+              class="mt-2 max-h-72 rounded-xl object-cover"
+              (error)="adjuntoRoto.set(true)"
+            />
+            <a
+              [href]="url"
+              target="_blank"
+              rel="noopener"
+              class="mt-2 inline-block text-xs text-purple-400 transition hover:text-purple-300"
+            >
+              Abrir imagen en nueva pestaña ↗
+            </a>
+          } @else {
+            <a
+              [href]="url"
+              target="_blank"
+              rel="noopener"
+              class="mt-2 inline-block max-w-full break-all text-sm text-purple-400 transition hover:text-purple-300"
+            >
+              🔗 {{ url }}
+            </a>
+          }
+        </div>
+      }
+    </header>
+
+    @if (puedeCalificar()) {
+      <div
+        class="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-500/15 to-sky-500/10 p-5 backdrop-blur-md"
+      >
+        <div>
+          <p class="font-semibold text-emerald-300">
+            ✅ Tu incidencia fue resuelta
+          </p>
+          <p class="mt-0.5 text-sm text-slate-300">
+            ¿Cómo calificarías la atención del técnico?
+          </p>
+        </div>
+        <button
+          (click)="abrirCalificacion()"
+          class="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-bold shadow-lg shadow-emerald-600/30 transition hover:brightness-110 active:scale-95"
+        >
+          ⭐ Cerrar Ticket & Calificar
+        </button>
+      </div>
+    }
+
+    <div class="mt-5 grid gap-5 lg:grid-cols-3">
+      <section
+        class="card-glow rounded-3xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-md lg:col-span-2"
+      >
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold">💬 Conversación</h2>
+          <span class="text-xs text-slate-500">
+            {{ comentarios().length }} mensaje{{ comentarios().length === 1 ? '' : 's' }}
+          </span>
+        </div>
+
+        <div class="mt-4 max-h-[420px] space-y-4 overflow-y-auto pr-1">
+          @if (comentarios().length === 0) {
+            <div class="py-10 text-center text-slate-500">
+              <p class="text-2xl">🗨️</p>
+              <p class="mt-2 text-sm">
+                Aún no hay mensajes. Inicia la conversación con el
+                {{ t.tecnicoEmail ? 'técnico' : 'solicitante' }}.
+              </p>
+            </div>
+          }
+          @for (c of comentarios(); track c.id) {
+            <div class="flex gap-2.5" [class.justify-end]="esMio(c)">
+              @if (!esMio(c)) {
+                <app-avatar
+                  [usuario]="{ nombre: c.autorNombre, avatarUrl: c.autorAvatar }"
+                  [tamano]="'sm'"
+                />
+              }
+              <div class="max-w-[78%]">
+                <div
+                  class="rounded-2xl px-4 py-2.5 text-sm"
+                  [class]="
+                    esMio(c)
+                      ? 'rounded-br-md bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/20'
+                      : 'rounded-bl-md border border-slate-800/80 bg-slate-800/70 text-slate-200'
+                  "
+                >
+                  @if (!esMio(c)) {
+                    <p class="mb-0.5 text-[11px] font-semibold text-purple-300">
+                      {{ c.autorNombre }}
+                    </p>
+                  }
+                  <p class="whitespace-pre-wrap break-words">{{ c.mensaje }}</p>
+                </div>
+                <p
+                  class="mt-1 text-[10px] text-slate-500"
+                  [class.text-right]="esMio(c)"
+                >
+                  {{ esMio(c) ? 'Tú' : c.autorNombre }} ·
+                  {{ formatoFecha(c.fechaCreacion) }}
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="mt-4 flex items-end gap-2">
+          <textarea
+            [(ngModel)]="nuevoMensaje"
+            name="nuevoMensaje"
+            rows="2"
+            placeholder="Escribe un mensaje… (Enter para enviar, Shift+Enter para salto de línea)"
+            (keydown.enter)="onEnter($event)"
+            class="flex-1 resize-none rounded-2xl border border-slate-800/80 bg-slate-950/60 px-4 py-2.5 text-sm text-white outline-none backdrop-blur-md transition placeholder:text-slate-600 focus:border-purple-600"
+          ></textarea>
+          <button
+            (click)="enviarComentario()"
+            [disabled]="enviando() || !nuevoMensaje().trim()"
+            class="rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-2.5 text-sm font-semibold shadow-lg shadow-purple-600/30 transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ enviando() ? '…' : 'Enviar' }}
+          </button>
+        </div>
+      </section>
+
+      <aside class="space-y-5">
+        <section class="rounded-3xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-md">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">
+            Detalles
+          </h2>
+          <div class="mt-3 space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-slate-500">Estado</span>
+              <span class="font-medium" [class]="claseEstado(t.estado)">
+                {{ labelEstado(t.estado) }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Prioridad</span>
+              <span class="font-medium text-slate-200">{{ t.prioridad }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Técnico</span>
+              <span class="font-medium text-slate-200">
+                {{ t.tecnicoEmail ?? 'Sin asignar' }}
+              </span>
+            </div>
+            @if (t.calificacion; as nota) {
+              <div class="flex justify-between">
+                <span class="text-slate-500">Calificación</span>
+                <span class="font-medium text-amber-300">⭐ {{ nota }}/5</span>
+              </div>
+            }
+          </div>
+
+          <h3 class="mt-5 text-sm font-semibold text-slate-400">
+            Descripción
+          </h3>
+          <p class="mt-2 whitespace-pre-wrap text-sm text-slate-300">
+            {{ t.descripcion }}
+          </p>
+
+          @if (t.solucion) {
+            <div class="mt-4 rounded-xl border border-sky-500/30 bg-sky-500/10 p-3">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-sky-400">
+                Solución del técnico
+              </p>
+              <p class="mt-1 text-sm text-slate-300">{{ t.solucion }}</p>
+            </div>
+          }
+        </section>
+
+        @if (puedeGestionar()) {
+          <section class="rounded-3xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-md">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">
+              🛠️ Panel técnico
+            </h2>
+
+            @if (error()) {
+              <p class="mt-3 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-sm text-rose-400">
+                {{ error() }}
+              </p>
+            }
+
+            <p class="mt-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Cambiar estado
+            </p>
+            @if (opcionesEstado().length === 0) {
+              <p class="mt-2 text-sm text-slate-500">Sin acciones de estado disponibles.</p>
+            } @else {
+              <div class="mt-2 flex flex-wrap gap-2">
+                @for (s of opcionesEstado(); track s) {
+                  <button
+                    (click)="cambiarEstado(s)"
+                    class="rounded-lg border border-slate-700/80 px-3 py-1.5 text-sm font-medium text-slate-300 transition hover:border-sky-500/60 hover:bg-sky-500/10 hover:text-white active:scale-95"
+                  >
+                    Cambiar a {{ labelEstado(s) }}
+                  </button>
+                }
+              </div>
+            }
+
+            <label class="mt-4 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Respuesta técnica
+            </label>
+            <textarea
+              [(ngModel)]="solucion"
+              name="solucion"
+              rows="3"
+              placeholder="Describe la solución aplicada…"
+              class="mt-2 w-full resize-none rounded-xl border border-slate-800/80 bg-slate-950/60 px-3.5 py-2.5 text-sm placeholder:text-slate-600 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+            ></textarea>
+            <button
+              (click)="guardarSolucion()"
+              [disabled]="guardandoSolucion()"
+              class="mt-2 w-full rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 py-2.5 text-sm font-semibold shadow-lg shadow-purple-600/30 transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+            >
+              {{ guardandoSolucion() ? 'Guardando…' : 'Guardar Solución' }}
+            </button>
+          </section>
+        }
+      </aside>
+    </div>
+  }
+</main>
+
+@if (mostrarCalificacion() && ticket(); as t) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+    (click)="cerrarCalificacion()"
+  >
+    <div
+      class="animate-modal-in w-full max-w-md rounded-3xl border border-slate-800/80 bg-slate-900 p-6 text-center backdrop-blur-md"
+      (click)="$event.stopPropagation()"
+    >
+      <div
+        class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-2xl"
+      >
+        ✅
+      </div>
+      <h2 class="mt-4 text-xl font-bold">Cerrar Ticket & Calificar</h2>
+      <p class="mt-1 text-sm text-slate-400">
+        El ticket se cerrará automáticamente. ¿Cómo fue la atención de
+        <span class="font-semibold text-slate-200">{{ t.tecnicoNombre ?? t.tecnicoEmail }}</span>?
+      </p>
+
+      <div class="mt-5 flex justify-center gap-2">
+        @for (n of [1, 2, 3, 4, 5]; track n) {
+          <button
+            (click)="calificacion.set(n)"
+            class="text-3xl transition hover:scale-125 active:scale-95"
+            [class]="calificacion() >= n ? 'grayscale-0' : 'opacity-30 grayscale'"
+          >
+            ⭐
+          </button>
+        }
+      </div>
+
+      @if (error()) {
+        <p class="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-sm text-rose-400">
+          {{ error() }}
+        </p>
+      }
+
+      <div class="mt-6 flex justify-center gap-3">
+        <button
+          (click)="cerrarCalificacion()"
+          class="rounded-xl border border-slate-700/80 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-slate-800/60"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="confirmarCalificacion()"
+          [disabled]="calificando() || calificacion() < 1"
+          class="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-semibold shadow-lg shadow-emerald-600/30 transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ calificando() ? 'Cerrando…' : 'Cerrar y Calificar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
